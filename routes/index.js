@@ -6,15 +6,37 @@ const apiBaseUrl = "http://api.themoviedb.org/3";
 const nowPlayingUrl = `${apiBaseUrl}/most_popular?api_key=${apiKey}`;
 const imageBaseUrl = "http://image.tmdb.org/t/p/w300";
 
+router.use((req, res, next) => {
+  res.locals.imageBaseUrl = imageBaseUrl;
+
+  next();
+});
+
 /* GET home page. */
 router.get("/", function (req, res, next) {
   request.get(nowPlayingUrl, (error, response, movieData) => {
+
     console.log(movieData);
 
     const parsedData = JSON.parse(movieData);
-    
+
     res.render("index", {
       parsedData: parsedData.results,
+    });
+  });
+});
+
+router.get("/movie/:id", (req, res, next) => {
+  const movieId = req.params.id;
+  const thisMovieUrl = `${apiBaseUrl}/movie/${movieId}?api_key=${apiKey}`;
+
+  request.get(thisMovieUrl, (error, response, movieData) => {
+    console.log(typeof movieData);
+
+    const parsedData = JSON.parse(movieData);
+
+    res.render("single-movie", {
+      parsedData,
     });
   });
 });
